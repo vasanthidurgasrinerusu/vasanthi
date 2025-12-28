@@ -1,0 +1,8 @@
+{
+  "name": "PayNow High-Eligibility Loan Helper",
+  "description": "An advanced AI assistant focused on maximizing loan approval through collateral analysis, document readiness, and real-time voice coaching.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
