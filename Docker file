@@ -1,0 +1,36 @@
+# --- Stage 1: Build the React App ---
+FROM node:20-alpine AS build
+WORKDIR /app
+
+# Accept the API Key as a build argument
+ARG GEMINI_API_KEY
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy everything else
+COPY . .
+
+# Write the API Key to .env.local so React sees it during build
+RUN echo "REACT_APP_GEMINI_API_KEY=$GEMINI_API_KEY" > .env.local
+
+# Build the project (creates the /build or /dist folder)
+RUN npm run build
+
+# --- Stage 2: Serve with Nginx ---
+FROM nginx:alpine
+
+# Copy the custom Nginx config
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy the built files from Stage 1 to Nginx's serving folder
+# Note: If you use Vite, change 'build' to 'dist'
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Cloud Run uses port 8080 by default
+EXPOSE 8080
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
+2. nginx.conf
